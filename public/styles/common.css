@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Nova+Mono&display=swap');
+
+:root
+{
+	--primary-color: #BF268A;
+	--primary-light-color: #D93BBE;
+
+	--secondary-color: #F26E50;
+	--secondary-light-color: #F2913D;
+	
+	--accent-color: #F2C029;
+	--accent-gradient: linear-gradient(90deg, rgba(191,38,138,1) 0%, rgba(242,110,80,1) 100%);
+	
+	--white-color: #F8F6F7;
+	--black-color: #38383D;
+	
+	--light-background: #FFF;
+	--darker-background: #F8F6F7;
+	--dark-background: #38383D;
+	
+	--large-space: 3rem;
+	--medium-space: 1.5em;
+	--small-space: 0.5em;
+	
+	color: var(--black-color);
+    font-family: 'Nova Mono', monospace;	
+}
+
+body, html
+{
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+*
+{
+	box-sizing: border-box;
+}
+
+/************
+ * COLORING *
+ ************/
+
+.cta
+{
+	color: var(--white-color);
+	background: var(--accent-gradient);
+	box-shadow: 0px 0px 8px var(--secondary-color);
+}
+
+/**********
+ * SIZING *
+ **********/
+.content-size
+{
+	width: -moz-fit-content;
+  	width: fit-content;
+  	
+	height: -moz-fit-content;
+  	height: fit-content;
+}
+
+
+/***********
+ * SPACING *
+ ***********/
+
+.space
+{
+	--space-top: inherit;
+	--space-right: inherit;
+	--space-bottom: inherit;
+	--space-left: inherit;
+}
+ 
+.space.no
+{
+	--space: 0px;	
+} 
+ 
+.space.large
+{
+	--space: var(--large-space);
+}
+
+.space.medium
+{
+	--space: var(--medium-space);
+}
+
+.space.small
+{
+	--space: var(--small-space);
+}
+
+.space.top
+{
+	--space-top: var(--space);
+}
+
+.space.right
+{
+	--space-right: var(--space);
+}
+
+.space.bottom
+{
+	--space-bottom: var(--space);
+}
+
+.space.left
+{
+	--space-left: var(--space);
+}
+
+.space.outer
+{
+	margin-top: var(--space-top);
+	margin-right: var(--space-right);
+	margin-bottom: var(--space-bottom);
+	margin-left: var(--space-left);
+}
+
+.space.inner
+{
+	padding-top: var(--space-top);
+	padding-right: var(--space-right);
+	padding-bottom: var(--space-bottom);
+	padding-left: var(--space-left);
+}

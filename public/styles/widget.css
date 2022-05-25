@@ -1,0 +1,208 @@
+/********
+ * LINE *
+ ********/
+.accent-line
+{
+	height: 0.5rem;
+	background: var(--accent-gradient);
+	border-radius: 0.5rem;
+}
+
+.accent-line.short
+{
+	width: 4rem;
+}
+
+
+/*******
+ * BOX *
+ *******/
+.box
+{
+	display: flex;
+}
+
+.box.column
+{
+	flex-direction: column;
+}
+
+.box.row
+{
+	flex-direction: row;
+}
+
+.box.from-start
+{
+	justify-content: flex-start;
+}
+
+.box.centered
+{
+	justify-content: center;
+}
+
+.box.from-end
+{
+	justify-content: flex-end;
+}
+
+.box.separated
+{
+	justify-content: space-between;
+}
+
+.box.spaced
+{
+	justify-content: space-around;
+}
+
+.box.start
+{
+	align-items: flex-start;
+}
+
+.box.center
+{
+	align-items: center;
+}
+
+.box.end
+{
+	align-items: flex-end;
+}
+
+.box.can-wrap
+{
+	flex-wrap: wrap;
+}
+
+/********
+ * CARD *
+ ********/
+
+.card
+{
+	display: block;
+	
+	width: 14rem;
+	height: 20rem;
+	
+	position: relative;
+
+	background-color: var(--dark-color);
+
+	border-radius: 1rem;
+	
+	overflow: hidden;
+}
+
+.card:not(:last-child)
+{
+	margin-right: 2rem;
+}
+
+.card > .label
+{
+	display: block;
+	
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 9999;
+	
+	width: 100%;
+	
+	height: -moz-fit-content;
+  	height: fit-content;
+  	
+  	background: rgba(125, 125, 125, 0.75);
+  	color: var(--white-color);
+  	
+  	padding: 0.5em;
+  	margin: 0;
+  	
+  	transform: translateY(100%);
+  	
+	transition: transform .5s;
+}
+
+.card:hover > .label
+{
+	transform: translateY(0);
+}
+
+.card > .background
+{
+	z-index: -1;
+	
+	width: 100%;
+	height: 100%;
+	
+	background-position: center;
+	background-size: cover;
+	
+	border-radius: 1rem;
+	
+	transition: transform .5s;
+}
+
+.card:hover > .background
+{
+	transform: scale(1.1);
+}
+
+/*****************
+ * LINE SELECTOR *
+ *****************/
+
+.line-selector
+{
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+  	
+	width: -moz-fit-content;
+  	width: fit-content;
+	
+	padding: 3px;
+	
+	background: var(--darker-background);
+	
+	border-radius: 3rem;
+}
+
+.line-selector > label
+{
+	cursor: pointer;
+}
+
+.line-selector > label:not(:last-child)
+{
+	margin-right: 1rem;
+}
+
+.line-selector > label > input
+{
+	display: none;
+}
+
+.line-selector > label > .label
+{
+	display: block;
+	
+	padding: 0.5rem;
+
+	color: var(--dark-color);
+		
+	border-radius: 3rem;	
+}
+
+.line-selector > label > input:checked ~ .label
+{	
+	color: var(--white-color);
+	background: var(--accent-gradient);
+	
+	box-shadow: 0 0 8px var(--secondary-color);
+}

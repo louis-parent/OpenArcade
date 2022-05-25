@@ -1,0 +1,24 @@
+{
+  "name": "Open Arcade",
+  "version": "1.0.0",
+  "description": "Gamehub for multiple online minigames.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "serve": "node index.js"
+  },
+  "keywords": [
+    "Game",
+    "Arcade",
+    "Online",
+    "Hub",
+    "Share",
+    "Free",
+    "Room"
+  ],
+  "author": "Louis Parent",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
