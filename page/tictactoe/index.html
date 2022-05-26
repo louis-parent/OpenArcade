@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Morpion</title>
+		
+		<meta charset="UTF-8" />
+		
+		<link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+		
+		<link rel="stylesheet" href="/styles/common.css" />
+		<link rel="stylesheet" href="/styles/widget.css" />
+		<link rel="stylesheet" href="/styles/standard.css" />
+		
+		<script src="/scripts/Link.js"></script>
+		
+		<script>
+			function createRoom()
+			{
+				fetch("/api/free/room/id").then((response) => {
+					response.json().then((data) => {
+						window.location.href = "/tictactoe/" + data
+					});
+				});
+			}
+		</script>
+	</head>
+	
+	<body>
+		<header>
+			<img src="/assets/logo.svg" alt="Logo" href="/"/>
+			<h1 href="/">Open Arcade</h1>
+		</header>
+		
+		<main class="box centered">
+			<section class="wide-card   half screen width">
+				<div class="left-side">
+					<h2>Morpion</h2>
+					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>					
+				</div>
+				
+				<div class="right-side" style="background-image: url('/assets/games/tictactoe/illustration.jpg');">
+					<button class="action cta box row center" onclick="createRoom()">
+						<span>Créer une Session</span>
+						<span class="small outer left space">▶</span>
+					</button>
+				</div>
+			</section>
+		</main>
+	</body>
+</html>

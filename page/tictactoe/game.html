@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Morpion</title>
+		
+		<meta charset="UTF-8" />
+		
+		<link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+		
+		<link rel="stylesheet" href="/styles/common.css" />
+		<link rel="stylesheet" href="/styles/widget.css" />
+		<link rel="stylesheet" href="/styles/standard.css" />
+		<script src="/socket.io/socket.io.js"></script>
+		
+		<script>
+			const path = window.location.pathname.split("/");
+			const room = path[path.length - 1];
+			
+			const socket = io();
+			
+			socket.on("error", error => {
+				document.getElementById("message").innerText = error.reason;
+			});
+			
+			socket.on("init", data => {
+				document.getElementById("message").innerText = "Connection Done";
+			});
+			
+			socket.emit("room", room);
+		</script>
+	</head>
+	
+	<body>
+		<header>
+			<img src="/assets/logo.svg" alt="Logo" href="/"/>
+			<h1 href="/">Open Arcade</h1>
+		</header>
+		
+		<main class="box centered">
+			<h2 id="message">Connection Pending...</h2>
+		</main>
+	</body>
+</html>

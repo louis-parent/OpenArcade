@@ -42,11 +42,27 @@ body, html
  * COLORING *
  ************/
 
-.cta
+.accent
 {
 	color: var(--white-color);
-	background: var(--accent-gradient);
+	background-color: var(--accent-color);
+	background-image: var(--accent-gradient);
 	box-shadow: 0px 0px 8px var(--secondary-color);
+}
+
+.background.light
+{
+	background-color: var(--light-background);
+}
+
+.background.dark
+{
+	background-color: var(--dark-background);
+}
+
+.background.gray
+{
+	background-color: var(--darker-background);
 }
 
 /**********
@@ -61,6 +77,16 @@ body, html
   	height: fit-content;
 }
 
+.screen.half.width
+{
+	width: 50vw;
+}
+
+.shrink
+{
+	max-width: 100%;
+	max-height: 100%;
+}
 
 /***********
  * SPACING *
@@ -68,10 +94,10 @@ body, html
 
 .space
 {
-	--space-top: inherit;
-	--space-right: inherit;
-	--space-bottom: inherit;
-	--space-left: inherit;
+	--space-top: initial;
+	--space-right: initial;
+	--space-bottom: initial;
+	--space-left: initial;
 }
  
 .space.no
@@ -128,4 +154,18 @@ body, html
 	padding-right: var(--space-right);
 	padding-bottom: var(--space-bottom);
 	padding-left: var(--space-left);
+}
+
+/************
+ * ROUNDING *
+ ************/
+ 
+.rounded
+{
+	border-radius: 3rem;
+}
+
+.round
+{
+	border-radius: 50%;
 }

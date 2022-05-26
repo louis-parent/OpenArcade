@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Open Arcade</title>
+		
+		<meta charset="UTF-8" />
+		
+		<link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+		
+		<link rel="stylesheet" href="/styles/common.css" />
+		<link rel="stylesheet" href="/styles/widget.css" />
+		<link rel="stylesheet" href="/styles/standard.css" />
+		
+		<script>
+			fetch("/api/games").then(response => {
+				response.json().then(games => {
+					const gameList = document.getElementById("games");
+			
+					for(let game of games)
+					{
+						let card = document.createElement("a");
+						card.classList.add("card")
+						card.href = game.link;
+						
+						let cardImage = document.createElement("div");
+						cardImage.classList.add("background");
+						cardImage.style.backgroundImage = "url('" + game.image + "')";
+			
+						let cardLabel = document.createElement("h3");
+						cardLabel.classList.add("label");
+						cardLabel.innerText = game.name;
+			
+						card.appendChild(cardImage);
+						card.appendChild(cardLabel);
+						gameList.appendChild(card);
+					}
+				});
+			});
+		</script>
+	</head>
+	
+	<body>
+		<header>
+			<img src="/assets/logo.svg" alt="Logo"/>
+			<h1>Open Arcade</h1>
+		</header>
+		
+		<main>
+			<div class="box row separated center">
+				<div class="content-size box column centered">
+					<h2 class="no top bottom outer space">Les Jeux</h2>
+					<div class="accent-line short"></div>
+				</div>
+				
+				<div class="line-selector">
+					<label>
+						<input name="filter" type="radio" checked="true"/>
+						<span class="label">Tous</span>
+					</label>
+					
+					<label>
+						<input name="filter" type="radio"/>
+						<span class="label">Multi</span>
+					</label>
+					
+					<label>
+						<input name="filter" type="radio"/>
+						<span class="label">Solo</span>
+					</label>	
+				</div>				
+			</div>
+			
+			<div id="games" class="box row from-start center can-wrap inner medium top space">
+			</div>
+		</main>
+	</body>
+</html>

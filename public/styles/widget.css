@@ -125,6 +125,8 @@
   	
   	transform: translateY(100%);
   	
+  	text-transform: capitalize;
+  	
 	transition: transform .5s;
 }
 
@@ -151,6 +153,68 @@
 .card:hover > .background
 {
 	transform: scale(1.1);
+}
+
+/*************
+ * WIDE CARD *
+ *************/
+ 
+.wide-card
+{
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	
+	border-radius: 1.5em;
+	
+	box-shadow: 1px 1px  4px var(--black-color);
+	
+	overflow: hidden;
+}
+
+.wide-card > .left-side
+{
+	display: flex;
+	flex-direction: column;
+	
+	max-width: 50%;
+	
+	padding: 5%;
+}
+
+.wide-card > .right-side
+{
+	position: relative;
+
+	width: 50%;
+	height: 100%;
+	
+	background-position: center;
+	background-size: cover;
+
+	overflow: hidden;
+}
+
+.wide-card > .right-side > .background
+{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	
+	height: 100%;
+	
+	transform: translate(-50%, -50%);
+	
+	overflow: hidden;
+}
+
+.wide-card > .right-side > .action
+{
+	position: absolute;
+	left: 50%;
+	bottom: 5%;
+	
+	transform: translateX(-50%);
 }
 
 /*****************
@@ -196,7 +260,7 @@
 
 	color: var(--dark-color);
 		
-	border-radius: 3rem;	
+	border-radius: 3rem;
 }
 
 .line-selector > label > input:checked ~ .label
@@ -205,4 +269,66 @@
 	background: var(--accent-gradient);
 	
 	box-shadow: 0 0 8px var(--secondary-color);
+}
+
+/**********
+ * BUTTON *
+ **********/
+
+.cta
+{
+	color: var(--white-color);
+	background: var(--accent-gradient);
+	
+	margin: 0.5rem;
+	padding: 1rem 1.5rem;
+	
+	border: none;		
+	border-radius: 3rem;
+	
+	text-transform: uppercase;
+	
+	cursor: pointer;
+	
+	transition: box-shadow .5s;
+}
+
+.cta:hover
+{
+	box-shadow: 2px 2px 8px var(--secondary-color);
+}
+
+.cta:active
+{
+	box-shadow: 0 0 8px var(--secondary-color);
+}
+
+/*********
+ * FIELD *
+ *********/
+ 
+.field
+{
+	padding: 1px;
+	
+	background: var(--black-color);
+	
+	border-radius: 0.75rem;
+}
+
+.field > input
+{
+	all: unset;
+	
+	padding: 0.33em;
+	
+	color: var(--black-color);
+	background: var(--light-background);
+	
+    border-radius: inherit;
+}
+
+.field:focus-within, .field:focus, .field:active
+{
+	background: var(--accent-gradient);
 }
