@@ -65,6 +65,12 @@ body, html
 	background-color: var(--darker-background);
 }
 
+.background.gradient
+{
+	background-color: var(--accent-color);
+	background-image: var(--accent-gradient);
+}
+
 /**********
  * SIZING *
  **********/

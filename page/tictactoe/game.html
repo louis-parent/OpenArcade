@@ -10,23 +10,159 @@
 		<link rel="stylesheet" href="/styles/common.css" />
 		<link rel="stylesheet" href="/styles/widget.css" />
 		<link rel="stylesheet" href="/styles/standard.css" />
+		
+		<style>
+			.clip-to-text
+			{
+				background-clip: text;
+				-webkit-background-clip: text;
+				color: transparent;
+			}
+			
+			.grid
+			{
+				font-size: 5rem;
+				text-align: center;
+			}
+			
+			.grid .row:not(:last-child)
+			{
+				border-bottom: solid 2px var(--black-color);
+			}
+			
+			.grid .cell
+			{
+				cursor: pointer;
+			
+				width: 6rem;
+				height: 6rem;
+			}
+			
+			.grid .cell:not(:last-child)
+			{
+				border-right: solid 2px var(--black-color);
+			}
+		</style>
+		
 		<script src="/socket.io/socket.io.js"></script>
 		
 		<script>
 			const path = window.location.pathname.split("/");
 			const room = path[path.length - 1];
 			
+			const Events = {
+				ERROR: "error",
+				INIT: "init",
+				ALONE: "alone",
+				CHECK: "check",
+				TURN: "turn",
+				ROOM: "room",
+				WIN: "win"
+			};
+			
 			const socket = io();
+		</script>
+		
+		<script>
+			function setGrid(grid)
+			{
+				let i = 0;
 			
-			socket.on("error", error => {
-				document.getElementById("message").innerText = error.reason;
+				for(let row of grid)
+				{
+					for(let cell of row)
+					{
+						setCell(i, cell);
+						i++;
+					}
+				}
+			}
+			
+			function setCell(id, value)
+			{
+				let c = "";
+			
+				switch(value)
+				{
+					case 1:
+						c = "X";
+						break;
+	
+					case 2:
+						c = "O";
+						break;
+				}
+
+				let cell = document.getElementById(id.toString());
+				cell.innerText = c;
+				cell.style.color = "";
+			}
+			
+			function askForAloneReset()
+			{
+				if(confirm("Vous êtes seul, voulez-vous réinitialiser la session ?"))
+				{
+					socket.emit(Events.RESET);
+				}
+				else
+				{
+					window.location.href = "/tictactoe";
+				}
+			}
+			
+			function checkCell(cellId)
+			{
+				socket.emit(Events.CHECK, cellId)
+			}
+			
+			function setStatus(text)
+			{
+				document.getElementById("status").innerText = text;
+			}
+			
+			function notifyWin(winner, cells)
+			{
+				if(winner === true)
+				{
+					setStatus("Vous avez gagné !")
+				}
+				else if(winner === false)
+				{
+					setStatus("Vous avez perdu...");
+				}
+				else
+				{
+					setStatus("C'est une égalité.");
+				}
+			
+				for(let i = 0; i < cells.length; i++)
+				{
+					document.getElementById(cells[i].toString()).style.color = "green";
+				}
+			}
+		</script>
+		
+		<script>
+			socket.on(Events.ERROR, error => {
+				alert("La salle de jeu est pleine");
 			});
 			
-			socket.on("init", data => {
-				document.getElementById("message").innerText = "Connection Done";
+			socket.on(Events.INIT, data => {
+				setGrid(data.grid);
+				setStatus(data.yourTurn ? "A votre tour de jouer" : "C'est au tour de l'adversaire");
 			});
 			
-			socket.emit("room", room);
+			socket.on(Events.ALONE, askForAloneReset);
+			
+			socket.on(Events.CHECK, (data) => {
+				setCell(data.cell, data.value);
+			});
+			
+			socket.on(Events.WIN, (data) => {
+				notifyWin(data.winner, data.cells);
+			});
+			
+			socket.emit(Events.ROOM, room);
 		</script>
 	</head>
 	
@@ -36,8 +172,27 @@
 			<h1 href="/">Open Arcade</h1>
 		</header>
 		
-		<main class="box centered">
-			<h2 id="message">Connection Pending...</h2>
+		<main class="box column center centered">
+			<h2 id="status"></h2>
+			<div class="box column grid">
+				<div class="box row">
+					<span id="0" class="background gradient clip-to-text cell" onclick="checkCell(0)"></span>
+					<span id="1" class="background gradient clip-to-text cell" onclick="checkCell(1)"></span>
+					<span id="2" class="background gradient clip-to-text cell" onclick="checkCell(2)"></span>
+				</div>
+				
+				<div class="box row">
+					<span id="3" class="background gradient clip-to-text cell" onclick="checkCell(3)"></span>
+					<span id="4" class="background gradient clip-to-text cell" onclick="checkCell(4)"></span>
+					<span id="5" class="background gradient clip-to-text cell" onclick="checkCell(5)"></span>
+				</div>
+				
+				<div class="box row">
+					<span id="6" class="background gradient clip-to-text cell" onclick="checkCell(6)"></span>
+					<span id="7" class="background gradient clip-to-text cell" onclick="checkCell(7)"></span>
+					<span id="8" class="background gradient clip-to-text cell" onclick="checkCell(8)"></span>
+				</div>
+			</div>
 		</main>
 	</body>
 </html>
