@@ -35,7 +35,12 @@ module.exports = class extends Room{
 		super(roomId);
 		
 		this.askingForReset = false;
-		this.resetResponseCount = 0;
+		this.resetResponseCount = {
+			player1: false,
+			player2: false
+		};
+		
+		this.isEnded = false;
 		
 		this.player1 = null;
 		this.player2 = null;
@@ -77,11 +82,11 @@ module.exports = class extends Room{
 			this.initializePlayer(player);
 			
 			player.on(Events.CHECK, (cell) => {
-				this.check(player, cell);
+				this.onCheck(player, cell);
 			});
 			
 			player.on(Events.RESET, (data) => {
-				this.askReset(player, data);
+				this.onReset(player, data);
 			});
 			
 			if(this.isFull())
@@ -124,6 +129,7 @@ module.exports = class extends Room{
 	
 	newGame()
 	{
+		this.isEnded = false;
 		this.turn = Turns.random();
 		
 		this.grid = [
@@ -142,12 +148,12 @@ module.exports = class extends Room{
 		});
 	}
 	
-	check(player, cell)
+	onCheck(player, cell)
 	{
 		const row = Math.floor(cell / 3);
 		const column = cell % 3;
 		
-		if(this.isFull() && this.grid[row][column] === CellType.EMPTY)
+		if(this.isFull() && !this.isEnded && this.grid[row][column] === CellType.EMPTY)
 		{
 			let isCorrectMove = false;
 			let newValue = CellType.EMPTY;
@@ -186,7 +192,10 @@ module.exports = class extends Room{
 	
 	changeTurn(turn)
 	{
-		this.turn = turn || this.turn;
+		if(turn != undefined)
+		{
+			this.turn = turn;
+		}
 		
 		if(this.turn === Turns.PLAYER1)
 		{
@@ -255,99 +264,146 @@ module.exports = class extends Room{
 			cells = [2, 4, 6];
 		}
 		else
-		{
-			let noEmpty = true;
-			
-			for(let row = 0; row < this.grid.length; row++)
-			{
-				for(let column = 0; column < this.grid[row].length; column++)
-				{
-					noEmpty &= this.grid[row][column] !== CellType.EMPTY;
-				}
-			}
-			
-			isEnded = noEmpty;
+		{			
+			isEnded = this.isGridCompleted();
 		}
 		
 		if(isEnded)
 		{
-			if(winner === CellType.PLAYER1)
-			{
-				this.player1.emit(Events.WIN, {
-					winner: true,
-					cells: cells
-				});
-				
-				this.player2.emit(Events.WIN, {
-					winner: false,
-					cells: cells
-				});
-			}
-			else if(winner === CellType.PLAYER2)
-			{
-				this.player1.emit(Events.WIN, {
-					winner: false,
-					cells: cells
-				});
-				
-				this.player2.emit(Events.WIN, {
-					winner: true,
-					cells: cells
-				});
-			}
-			else
-			{
-				this.broadcast(Events.WIN, {
-					winner: undefined,
-					cells: cells
-				});
-			}
+			this.isEnded = true;
+			this.notifyWin(winner, cells);
 		}
 	}
 	
-	askReset(asker, confirm)
+	isGridCompleted()
 	{
-		if(this.askingForReset)
+		let noEmpty = true;
+			
+		for(let row = 0; row < this.grid.length; row++)
 		{
-			if(confirm)
+			for(let column = 0; column < this.grid[row].length; column++)
 			{
-				this.resetResponseCount++;
-				
-				if(this.resetResponseCount === this.size())
-				{
-					this.newGame();
-					this.initializePlayer(this.player1);
-					this.initializePlayer(this.player2);
-					
-					this.askingForReset = false;
-				}			
-			}
-			else
-			{
-				this.broadcast(Events.CANCEL_RESET);
-				this.askingForReset = false;
+				noEmpty &= this.grid[row][column] !== CellType.EMPTY;
 			}
 		}
-		else if(this.size() == 1)
+		
+		return noEmpty;
+	}
+	
+	notifyWin(winner, cells)
+	{
+		if(winner === CellType.PLAYER1)
 		{
-			this.newGame();
+			this.player1.emit(Events.WIN, {
+				winner: true,
+				cells: cells
+			});
 			
-			if(this.player1 !== null)
-			{
-				this.initializePlayer(this.player1);
-			}
+			this.player2.emit(Events.WIN, {
+				winner: false,
+				cells: cells
+			});
+		}
+		else if(winner === CellType.PLAYER2)
+		{
+			this.player1.emit(Events.WIN, {
+				winner: false,
+				cells: cells
+			});
 			
-			if(this.player2 !== null)
-			{
-				this.initializePlayer(this.player2);
-			}
+			this.player2.emit(Events.WIN, {
+				winner: true,
+				cells: cells
+			});
 		}
 		else
 		{
-			this.resetResponseCount = 1;
-			this.askingForReset = true;
-			
-			this.emitToOther(asker, Events.ASK_RESET);
+			this.broadcast(Events.WIN, {
+				winner: undefined,
+				cells: cells
+			});
 		}
+	}
+	
+	onReset(asker, confirm)
+	{
+		if(this.askingForReset)
+		{
+			this.receiveResetResponse(asker, confirm);
+		}
+		else if(this.size() == 1)
+		{
+			this.reset();
+		}
+		else
+		{
+			this.askForReset(asker);
+		}
+	}
+	
+	receiveResetResponse(player, confirm)
+	{
+		if(confirm)
+		{
+			this.setResetResponseFrom(player);
+			
+			if(this.resetResponseCount.player1 === true && this.resetResponseCount.player2 === true)
+			{
+				this.newGame();
+				this.initializePlayer(this.player1);
+				this.initializePlayer(this.player2);
+				
+				this.stopResetAsking();
+			}			
+		}
+		else
+		{
+			this.broadcast(Events.CANCEL_RESET);
+			this.stopResetAsking();
+		}
+	}
+	
+	setResetResponseFrom(player)
+	{
+		if(player === this.player1)
+		{
+			this.resetResponseCount.player1 = true;
+		}
+		else if(player === this.player2)
+		{
+			this.resetResponseCount.player2 = true;
+		}
+		
+		console.log(this.resetResponseCount);
+	}
+	
+	reset()
+	{
+		this.newGame();
+			
+		if(this.player1 !== null)
+		{
+			this.initializePlayer(this.player1);
+		}
+		
+		if(this.player2 !== null)
+		{
+			this.initializePlayer(this.player2);
+		}
+	}
+	
+	askForReset(asker)
+	{
+		this.setResetResponseFrom(asker);
+		this.askingForReset = true;
+		
+		this.emitToOther(asker, Events.ASK_RESET);
+	}
+	
+	stopResetAsking()
+	{
+		this.askingForReset = false;
+		this.resetResponseCount.player1 = false;
+		this.resetResponseCount.player2 = false;
 	}
 };
