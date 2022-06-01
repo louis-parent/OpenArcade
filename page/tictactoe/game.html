@@ -167,7 +167,15 @@
 			
 			socket.on(Events.INIT, data => {
 				setGrid(data.grid);
-				newTurn(data.yourTurn);
+				
+				if(data.waintingForPlayer)
+				{
+					setStatus("En attente d'un autre joueur...");
+				}
+				else
+				{
+					newTurn(data.yourTurn);
+				}
 			});
 			
 			socket.on(Events.ALONE, askForAloneReset);

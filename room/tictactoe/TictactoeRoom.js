@@ -10,7 +10,8 @@ const Events = {
 	WIN: "win",
 	RESET: "reset",
 	ASK_RESET: "ask_reset",
-	CANCEL_RESET: "cancel_reset"
+	CANCEL_RESET: "cancel_reset",
+	FULL: "full"
 };
 
 const Turns = {
@@ -82,6 +83,11 @@ module.exports = class extends Room{
 			player.on(Events.RESET, (data) => {
 				this.askReset(player, data);
 			});
+			
+			if(this.isFull())
+			{
+				this.changeTurn();
+			}
 		}
 		else
 		{
@@ -130,6 +136,7 @@ module.exports = class extends Room{
 	initializePlayer(player)
 	{		
 		player.emit(Events.INIT, {
+			waintingForPlayer: !this.isFull(),
 			yourTurn: (this.player1 === player && this.turn === Turns.PLAYER1) || (this.player2 === player && this.turn === Turns.PLAYER2),
 			grid: this.grid
 		});
@@ -179,7 +186,7 @@ module.exports = class extends Room{
 	
 	changeTurn(turn)
 	{
-		this.turn = turn;
+		this.turn = turn || this.turn;
 		
 		if(this.turn === Turns.PLAYER1)
 		{
@@ -321,8 +328,22 @@ module.exports = class extends Room{
 				this.askingForReset = false;
 			}
 		}
+		else if(this.size() == 1)
+		{
+			this.newGame();
+			
+			if(this.player1 !== null)
+			{
+				this.initializePlayer(this.player1);
+			}
+			
+			if(this.player2 !== null)
+			{
+				this.initializePlayer(this.player2);
+			}
+		}
 		else
-		{			
+		{
 			this.resetResponseCount = 1;
 			this.askingForReset = true;
 			
