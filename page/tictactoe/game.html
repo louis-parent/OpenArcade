@@ -57,7 +57,10 @@
 				CHECK: "check",
 				TURN: "turn",
 				ROOM: "room",
-				WIN: "win"
+				WIN: "win",
+				RESET: "reset",
+				ASK_RESET: "ask_reset",
+				CANCEL_RESET: "cancel_reset"
 			};
 			
 			const socket = io();
@@ -140,6 +143,21 @@
 					document.getElementById(cells[i].toString()).style.color = "green";
 				}
 			}
+									 
+			function askForNewGame()
+			{
+				socket.emit(Events.RESET);
+			}
+			
+			function responseForNewGame()
+			{
+				socket.emit(Events.RESET, confirm("Confirmer la demande de nouvelle partie ?"));
+			}
+									 
+			function newTurn(yourTurn)
+			{
+				setStatus(yourTurn ? "A votre tour de jouer" : "C'est au tour de l'adversaire");
+			}
 		</script>
 		
 		<script>
@@ -149,7 +167,7 @@
 			
 			socket.on(Events.INIT, data => {
 				setGrid(data.grid);
-				setStatus(data.yourTurn ? "A votre tour de jouer" : "C'est au tour de l'adversaire");
+				newTurn(data.yourTurn);
 			});
 			
 			socket.on(Events.ALONE, askForAloneReset);
@@ -160,6 +178,18 @@
 			
 			socket.on(Events.WIN, (data) => {
 				notifyWin(data.winner, data.cells);
+			});
+			
+			socket.on(Events.ASK_RESET, () => {
+				responseForNewGame();
+			});
+			
+			socket.on(Events.CANCEL_RESET, () => {
+				alert("La demande de nouvelle partie a été annulé");
+			});
+			
+			socket.on(Events.TURN, (yourTurn) => {
+				newTurn(yourTurn);
 			});
 			
 			socket.emit(Events.ROOM, room);
@@ -173,7 +203,13 @@
 		</header>
 		
 		<main class="box column center centered">
+			<button class="action cta box row center" onclick="askForNewGame()">
+				<span>Rejouer</span>
+				<span class="small outer left space">🔁</span>
+			</button>
+			
 			<h2 id="status"></h2>
+			
 			<div class="box column grid">
 				<div class="box row">
 					<span id="0" class="background gradient clip-to-text cell" onclick="checkCell(0)"></span>

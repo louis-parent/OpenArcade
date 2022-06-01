@@ -7,7 +7,10 @@ const Events = {
 	ALONE: "alone",
 	CHECK: "check",
 	TURN: "turn",
-	WIN: "win"
+	WIN: "win",
+	RESET: "reset",
+	ASK_RESET: "ask_reset",
+	CANCEL_RESET: "cancel_reset"
 };
 
 const Turns = {
@@ -30,10 +33,29 @@ module.exports = class extends Room{
 	{
 		super(roomId);
 		
+		this.askingForReset = false;
+		this.resetResponseCount = 0;
+		
 		this.player1 = null;
 		this.player2 = null;
 		
-		this.reset();
+		this.newGame();
+	}
+	
+	emitToOther(player, event, data)
+	{
+		let other = null;
+			
+		if(player === this.player1)
+		{
+			other = this.player2;
+		}
+		else if(player === this.player2)
+		{
+			other = this.player1;
+		}
+		
+		other.emit(event, data);
 	}
 	
 	connect(player)
@@ -55,6 +77,10 @@ module.exports = class extends Room{
 			
 			player.on(Events.CHECK, (cell) => {
 				this.check(player, cell);
+			});
+			
+			player.on(Events.RESET, (data) => {
+				this.askReset(player, data);
 			});
 		}
 		else
@@ -90,13 +116,6 @@ module.exports = class extends Room{
 		return "TicTacToe";
 	}
 	
-	reset()
-	{
-		this.score1 = 0;
-		this.score2 = 0;
-		this.newGame();
-	}
-	
 	newGame()
 	{
 		this.turn = Turns.random();
@@ -112,8 +131,6 @@ module.exports = class extends Room{
 	{		
 		player.emit(Events.INIT, {
 			yourTurn: (this.player1 === player && this.turn === Turns.PLAYER1) || (this.player2 === player && this.turn === Turns.PLAYER2),
-			score1: this.score1,
-			score2: this.score2,
 			grid: this.grid
 		});
 	}
@@ -125,24 +142,30 @@ module.exports = class extends Room{
 		
 		if(this.isFull() && this.grid[row][column] === CellType.EMPTY)
 		{
+			let isCorrectMove = false;
 			let newValue = CellType.EMPTY;
 			let nextTurn = Turns.PLAYER1;
 			
 			if(player === this.player1 && this.turn === Turns.PLAYER1)
 			{
+				isCorrectMove = true;
 				newValue = CellType.PLAYER1;
 				nextTurn = Turns.PLAYER2;
 			}
 			else if(player === this.player2 && this.turn === Turns.PLAYER2)
 			{
+				isCorrectMove = true;
 				newValue = CellType.PLAYER2;
 				nextTurn = Turns.PLAYER1;
 			}
 			
-			this.checkToAll(cell, newValue);
-			this.grid[row][column] = newValue;
-			this.changeTurn(nextTurn);
-			this.verifyWin();
+			if(isCorrectMove)
+			{
+				this.checkToAll(cell, newValue);
+				this.grid[row][column] = newValue;
+				this.changeTurn(nextTurn);
+				this.verifyWin();
+			}
 		}
 	}
 	
@@ -161,12 +184,12 @@ module.exports = class extends Room{
 		if(this.turn === Turns.PLAYER1)
 		{
 			this.player1.emit(Events.TURN, true);
-			this.player1.emit(Events.TURN, false);
+			this.player2.emit(Events.TURN, false);
 		}
 		else if(this.turn === Turns.PLAYER2)
 		{
 			this.player1.emit(Events.TURN, false);
-			this.player1.emit(Events.TURN, true);
+			this.player2.emit(Events.TURN, true);
 		}
 	}
 	
@@ -272,6 +295,38 @@ module.exports = class extends Room{
 					cells: cells
 				});
 			}
+		}
+	}
+	
+	askReset(asker, confirm)
+	{
+		if(this.askingForReset)
+		{
+			if(confirm)
+			{
+				this.resetResponseCount++;
+				
+				if(this.resetResponseCount === this.size())
+				{
+					this.newGame();
+					this.initializePlayer(this.player1);
+					this.initializePlayer(this.player2);
+					
+					this.askingForReset = false;
+				}			
+			}
+			else
+			{
+				this.broadcast(Events.CANCEL_RESET);
+				this.askingForReset = false;
+			}
+		}
+		else
+		{			
+			this.resetResponseCount = 1;
+			this.askingForReset = true;
+			
+			this.emitToOther(asker, Events.ASK_RESET);
 		}
 	}
 };
