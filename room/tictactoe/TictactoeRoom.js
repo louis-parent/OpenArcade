@@ -373,8 +373,6 @@ module.exports = class extends Room{
 		{
 			this.resetResponseCount.player2 = true;
 		}
-		
-		console.log(this.resetResponseCount);
 	}
 	
 	reset()

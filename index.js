@@ -12,7 +12,7 @@ const socketServer = new SocketServer(server);
 const port = 8080;
 
 const games = [{
-	name: "Morpion",
+	name: "Tic-Tac-Toe",
 	image: "/assets/games/tictactoe/illustration.jpg",
 	link: "/tictactoe/"
 }];
